@@ -16,6 +16,7 @@ import { JwtService } from '@nestjs/jwt';
 import { jwtPayload } from './interfaces/jwt.paypload';
 //import { LoginResponse } from './interfaces/login-response';
 import { RegisterUserDto } from './dto/register-user.dto';
+import { LoginResponse } from './interfaces/login-response';
 
 @Injectable()
 export class AuthService {
@@ -68,10 +69,10 @@ export class AuthService {
 
     //const { password: _, ...rest } = user.toJSON();
 
-    // return {
-    //   user: rest,
-    //   token: this.getJwtToken({ id: user.id }),
-    // };
+    return {
+      user: user,
+      token: this.getJwtToken({ id: user.id }),
+    };
 
     return await user.save();
   }
