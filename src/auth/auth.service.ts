@@ -14,6 +14,8 @@ import * as bcryptjs from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { jwtPayload } from './interfaces/jwt.paypload';
+//import { LoginResponse } from './interfaces/login-response';
+import { RegisterUserDto } from './dto/register-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -42,6 +44,15 @@ export class AuthService {
       }
       throw new InternalServerErrorException('Something has happened');
     }
+  }
+
+  async register(registerDto: RegisterUserDto) {
+    const user = await this.create(registerDto);
+
+    return {
+      user: user,
+      token: this.getJwtToken({ id: user._id }),
+    };
   }
 
   async login(loginDto: LoginDto) {
