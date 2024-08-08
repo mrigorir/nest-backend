@@ -15,6 +15,7 @@ import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { jwtPayload } from './interfaces/jwt.paypload';
 import { RegisterUserDto } from './dto/register-user.dto';
+import { LoginResponse } from './interfaces/login-response';
 //import { LoginResponse } from './interfaces/login-response';
 
 @Injectable()
@@ -33,11 +34,9 @@ export class AuthService {
         ...userData,
       });
 
-      return await newUser.save();
-
       //const { password: _, ...user } = newUser.toJSON();
 
-      //return user;
+      return await newUser.save();
     } catch (error) {
       if (error.code === 11000) {
         throw new BadRequestException(`${createUserDto.email} already exists`);
@@ -46,17 +45,17 @@ export class AuthService {
     }
   }
 
-  async register(registerDto: RegisterUserDto) {
+  async register(registerDto: RegisterUserDto): Promise<LoginResponse> {
     const user = await this.create(registerDto);
 
     console.log('TOKEN: ', this.getJwtToken({ id: user._id }));
     return {
       user: user,
-      token: this.getJwtToken({ id: user._id }),
+      token: await this.getJwtToken({ id: user._id }),
     };
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto): Promise<LoginResponse> {
     const { email, password } = loginDto;
     const user = await this.userModel.findOne({ email });
     if (!user) {
@@ -71,10 +70,8 @@ export class AuthService {
 
     return {
       user: user,
-      token: this.getJwtToken({ id: user.id }),
+      token: await this.getJwtToken({ id: user.id }),
     };
-
-    return await user.save();
   }
 
   findAll(): Promise<User[]> {
